@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amelia O'Halloran</title>
+  <style>
+    html {
+      overflow-y: scroll; /* keeps layout consistent across pages */
+    }
+
+    body {
+      margin: 0;
+      font-family: "Times New Roman", Times, serif;
+      background-color: #f0e7d8; /* darker tan */
+      color: #0a1a3c; /* dark blue */
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      align-items: flex-start;
+      margin-top: 5vh; /* slightly above center */
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: #f0e7d8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
+      margin-left: 40px;
+      flex-shrink: 0;
+      justify-content: flex-start;
+      position: sticky;
+      top: 5vh; /* visually slightly below top */
+      height: calc(100vh - 10vh);
+    }
+
+    .sidebar img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1.25rem;
+      border: 2px solid #0a1a3c;
+    }
+
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+      text-align: center;
+    }
+
+    .sidebar button {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 1rem;
+      color: #0a1a3c; /* default dark blue */
+      cursor: pointer;
+      position: relative;
+      padding: 0.4rem;
+      transition: color 0.5s ease;
+    }
+
+    /* Change color to brown on hover or active */
+    .sidebar button:hover,
+    .sidebar button.active {
+      color: #8B4513; /* brown */
+    }
+
+    /* Main Content */
+    main {
+      flex-grow: 1;
+      max-width: 900px;
+      line-height: 1.6;
+      padding: 3rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      margin-left: 350px; /* space for sidebar */
+    }
+
+    section {
+      display: none;
+      min-height: calc(100vh - 6rem);
+    }
+
+    section.active {
+      display: block;
+    }
+
+    h1, h2, h3 {
+      font-weight: normal;
+    }
+
+    .item {
+      margin-bottom: 2rem;
+    }
+
+    .item h3 {
+      margin-bottom: 0.25rem;
+      font-size: 1.2rem;
+    }
+
+    .item h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      font-style: italic;
+      opacity: 0.8;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    a {
+      color: #0a1a3c;
+      text-decoration: underline;
+    }
+
+    a:hover {
+      color: #07122b;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 800px) {
+      body {
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+
+      .container {
+        flex-direction: column;
+        margin-top: 0;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: center;
+        margin-left: 0;
+        padding: 1rem;
+        position: static;
+      }
+
+      main {
+        height: auto;
+        justify-content: flex-start;
+        padding: 2rem 1rem;
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <img src="photo.jpg" alt="Amelia O'Halloran">
+      <nav>
+        <button class="tab-button active" data-tab="home">Home</button>
+        <button class="tab-button" data-tab="experience">Experience</button>
+        <button class="tab-button" data-tab="projects">Projects</button>
+        <button class="tab-button" data-tab="contact">Contact</button>
+      </nav>
+    </aside>
+
+    <main>
+      <section id="home" class="active">
+        <h2>Amelia O'Halloran</h2>
+        <p>
+          I am currently a Pre-Doctoral Research Fellow at the Project on Human Development in Chicago Neighborhoods (PHDCN+) in the Sociology Department at Harvard University. 
+          <br>
+          <br>
+          My work uses primarily quantitative methods and focuses on neighborhood trust, urbanization, domestic violence, incarceration, residential mobility, and deviance. 
+          <br>
+          <br>
+          I studied computer science at Brown University with a focus on cybersecurity; I also hold an MPhil from the University of Cambridge in Digital Humanities.
+          <br> 
+          <br>
+          <br>
+          <em>Currently reading: Wind/Pinball (Haruki Murakami); In My Father's House (Fox Butterfield)</em>
+          <br>
+          <em>Currently watching: Toronto Maple Leafs season (this is our year!!)</em>
+
+        </p>
+      </section>
+
+      <section id="experience">
+        <h2>Employment</h2>
+        <div class="item">
+          <h3>Pre-Doctoral Research Fellow</h3>
+          <h4>Harvard University Sociology Department: July 2024 - Present</h4>
+          <p>I work as a Pre-Doctoral Fellow with Professor Robert Sampson on the Project for Human Development in Chicago Neighborhoods (PHDCN+). I worked closely with Professor Sampson on his upcoming book, Marked by Time (2026), including creating figures, editing chapters, and writing sections of the manuscript. I also contributed to and edited multiple published papers, gathered and analyzed data from multiple sources (PHDCN+ survey data, CDC data, Chicago Police Department data), and wrote grant reports and proposals. I am an organizer of Harvard's Urban Data Lab within the Sociology Department.</p>
+        </div>
+        <div class="item">
+          <h3>Researcher</h3>
+          <h4>University of Cambridge's Minderoo Centre for Technology and Democracy: October 2023 - July 2024</h4>
+          <p>I worked as a Researcher with Sociology professor Gina Neff at the University of Cambridge. I performed expert interviews and literature reviews to write a whitepaper on AI risks for Responsible AI UK. I also independently led a research project mapping global Responsible AI groups to develop collaborative ties.</p>
+        </div>
+        <div class="item">
+          <h3>Digital Business Analyst</h3>
+          <h4>McKinsey & Company: August 2021 – May 2023 </h4>
+          <p>Brief description of your role, responsibilities, and accomplishments.</p>
+        </div>
+
+        <h2>Education</h2>
+        <div class="item">
+          <h3>Brown University</h3>
+          <h4>B.Sc., Computer Science and East Asian Studies (double major): September 2017 – May 2021</h4>
+        </div>
+        <div class="item">
+          <h3>University of Cambridge</h3>
+          <h4>MPhil, Digital Humanities: September 2023 – May 2024</h4>
+        </div>
+      </section>
+
+      <section id="projects">
+        <h2>Projects</h2>
+        <div class="item">
+          <h3>Privacy Caselaw in the US and UK</h3>
+          <h4>Created as part of the MPhil in Digital Humanities at the University of Cambridge</h4>
+          <p>Short description of the project, what you built, or what problem it solved.</p>
+        </div>
+        <div class="item">
+          <h3>Mapping Residential Mobility among PHDCN+ participants</h3>
+          <h4>Created as a Pre-Doctoral Research Fellow with the Project on Human Development in Chicago Neighborhoods (PHDCN+)</h4>
+          <p>Short description of the project, what you built, or what problem it solved.</p>
+        </div>
+        <div class="item">
+          <h3>Project Title</h3>
+          <h4>Subtitle or Context</h4>
+          <p>Short description of the project, what you built, or what problem it solved.</p>
+        </div>
+      </section>
+
+      <section id="contact">
+        <h2>Contact</h2>
+        <p>Email: <a href="mailto:ameliaohalloran7@gmail.com">ameliaohalloran7@gmail.com</a></p>
+      </section>
+
+      <footer></footer>
+    </main>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('.tab-button');
+    const sections = document.querySelectorAll('section');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        const target = button.dataset.tab;
+        sections.forEach(section => {
+          section.classList.toggle('active', section.id === target);
+        });
+
+        // Scroll main back to top each time
+        document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
