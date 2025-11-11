@@ -28,6 +28,13 @@
       margin-top: 5vh; /* slightly above center */
     }
 
+    .section-divider {
+      border: none;
+      border-top: 3px solid #0a1a3c;   /* thicker dark blue */
+      margin: 2rem 0;
+      opacity: 0.4;                    /* soften it slightly */
+    }
+
     /* Sidebar */
     .sidebar {
       width: 250px;
@@ -36,7 +43,7 @@
       flex-direction: column;
       align-items: center;
       padding: 1.5rem 1rem;
-      margin-left: 40px;
+      margin-left: 80px;
       flex-shrink: 0;
       justify-content: flex-start;
       position: sticky;
@@ -50,7 +57,7 @@
       border-radius: 50%;
       object-fit: cover;
       margin-bottom: 1.25rem;
-      border: 2px solid #0a1a3c;
+      border: none;
     }
 
     .sidebar nav {
@@ -81,15 +88,15 @@
 
     /* Main Content */
     main {
-      flex-grow: 1;
-      max-width: 900px;
+      flex-grow: 0;
+      max-width: 650px;       /* thinner column */
       line-height: 1.6;
-      padding: 3rem;
+      padding: 2.5rem 2rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      margin-left: 350px; /* space for sidebar */
+      margin-left: 260px;     /* shifted left */
     }
 
     section {
@@ -118,6 +125,7 @@
       margin: 0 0 0.5rem 0;
       font-size: 1rem;
       font-style: italic;
+      font-weight: normal;
       opacity: 0.8;
     }
 
@@ -135,6 +143,42 @@
 
     a:hover {
       color: #07122b;
+    }
+
+    .item {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #0a1a3c33; /* subtle dark blue, 20% opacity */
+    }
+    .item:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+    } 
+
+    .no-border {
+      border-bottom: none !important;
+      padding-bottom: 0;
+    }
+
+    .see-more {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      font-family: "Times New Roman", Times, serif;
+      color: #0a1a3c;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      margin-top: 0.5rem;
+      font-style:italic;
+    }
+
+    .see-more:hover {
+      color: #8B4513;
+    }
+
+    .more-text img {
+      border-radius: 4px;
     }
 
     /* Responsive adjustments */
@@ -184,19 +228,17 @@
       <section id="home" class="active">
         <h2>Amelia O'Halloran</h2>
         <p>
-          I am currently a Pre-Doctoral Research Fellow at the Project on Human Development in Chicago Neighborhoods (PHDCN+) in the Sociology Department at Harvard University. 
+          I am a Pre-Doctoral Research Fellow at the Project on Human Development in Chicago Neighborhoods (PHDCN+) in the Sociology Department at Harvard University. 
           <br>
           <br>
           My work uses primarily quantitative methods and focuses on neighborhood trust, urbanization, domestic violence, incarceration, residential mobility, and deviance. 
           <br>
           <br>
-          I studied computer science at Brown University with a focus on cybersecurity; I also hold an MPhil from the University of Cambridge in Digital Humanities.
+          I studied computer science at Brown University; I also hold an MPhil from the University of Cambridge in Digital Humanities.
           <br> 
           <br>
           <br>
-          <em>Currently reading: Wind/Pinball (Haruki Murakami); In My Father's House (Fox Butterfield)</em>
-          <br>
-          <em>Currently watching: Toronto Maple Leafs season (this is our year!!)</em>
+          
 
         </p>
       </section>
@@ -213,11 +255,18 @@
           <h4>University of Cambridge's Minderoo Centre for Technology and Democracy: October 2023 - July 2024</h4>
           <p>I worked as a Researcher with Sociology professor Gina Neff at the University of Cambridge. I performed expert interviews and literature reviews to write a whitepaper on AI risks for Responsible AI UK. I also independently led a research project mapping global Responsible AI groups to develop collaborative ties.</p>
         </div>
-        <div class="item">
+        <div class="item no-border">
           <h3>Digital Business Analyst</h3>
           <h4>McKinsey & Company: August 2021 – May 2023 </h4>
-          <p>Brief description of your role, responsibilities, and accomplishments.</p>
+          <p>I focused on uplifting organizations’ cybersecurity, trust, and privacy, including the following projects:
+            <ul>
+              <li>Designated team lead, managing a team of analysts to develop and facilitate a cybersecurity strategy workshop for 15+ CISOs of major medical organizations.</li>
+              <li>Guided a Taiwanese electronics manufacturer to implement cybersecurity initiatives to uplift customer safety. Wrote cybersecurity and privacy standards and procedures in English and Mandarin.</li>
+              <li>Guided a leading global bank through a regulatory response to a federal cybersecurity inquiry.</li>
+            </ul>
+          </p>
         </div>
+        <hr class="section-divider">
 
         <h2>Education</h2>
         <div class="item">
@@ -233,19 +282,41 @@
       <section id="projects">
         <h2>Projects</h2>
         <div class="item">
-          <h3>Privacy Caselaw in the US and UK</h3>
-          <h4>Created as part of the MPhil in Digital Humanities at the University of Cambridge</h4>
-          <p>Short description of the project, what you built, or what problem it solved.</p>
-        </div>
-        <div class="item">
           <h3>Mapping Residential Mobility among PHDCN+ participants</h3>
           <h4>Created as a Pre-Doctoral Research Fellow with the Project on Human Development in Chicago Neighborhoods (PHDCN+)</h4>
-          <p>Short description of the project, what you built, or what problem it solved.</p>
+          <p>Animated map of the residential mobility of PHDCN+ participants, from 1995 to 2024, based on survey waves, built using R.</p>
+        <div class="more-text" style="display:none;">
+          <p>
+            Also presented on the <a href="https://sites.harvard.edu/phdcn/">PHDCN+ homepage.</a>
+          </p>
+          <img src="animated_map_Nov_11_2024.gif" alt="Animated map of PHDCN+ Participant residential movement" style="max-width:100%; margin-top:10px;">
         </div>
+        <button class="see-more" data-open="false">See more</button>
+      </div>
         <div class="item">
-          <h3>Project Title</h3>
-          <h4>Subtitle or Context</h4>
-          <p>Short description of the project, what you built, or what problem it solved.</p>
+          <h3>Privacy Caselaw in the US and UK</h3>
+          <h4>Created as part of the MPhil in Digital Humanities at the University of Cambridge</h4>
+          <p>Textual analysis of privacy-related caselaw in the US and the UK, performed using Python and R.</p>
+        <div class="more-text" style="display:none;">
+          <p>
+            I conducted a "distant reading" of privacy-related caselaw, first by using Python to extract the text of all cases from the US Supreme Court and the UK Supreme Court (or the UK House of Lords prior to 2009), then by using R to perform keyword-in-context analyses. The two figures below are sample outputs of this analysis, wherein I focus on the keywords of privacy-related caselaw in one country that are unique to privacy-related cases as opposed to non-privacy-related cases. This allows us to compare the privacy-specific topics and themes across the two jurisdictions, finding that the US had a more technological bent to privacy cases, whereas the UK's privacy orientation was typically that of journalistic and media-related questions. If you are interested in the additional outcomes of this analysis, such as the partisan nature of privacy in the US or the most common precedents invoked across jurisdictions, please email me.  
+          </p>
+          <p>
+          <img src="caselaw_1.png" alt="Words that were most unique to privacy-related cases in the UK" style="max-width:100%; margin-top:10px;">
+        </p>
+          <p>
+            <img src="caselaw_2.png" alt="Words that were most unique to privacy-related cases in the UK" style="max-width:100%; margin-top:10px;">
+          </p>
+        </div>
+        <button class="see-more" data-open="false">See more</button>
+      </div>
+
+        
+      
+
+        <div class="item">
+          <h3>More projects coming soon!</h3>
+          
         </div>
       </section>
 
@@ -277,5 +348,25 @@
       });
     });
   </script>
+  <script>
+  const expandButtons = document.querySelectorAll(".see-more");
+
+  expandButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const moreText = btn.previousElementSibling; // the .more-text div
+      const isOpen = btn.getAttribute("data-open") === "true";
+
+      if (isOpen) {
+        moreText.style.display = "none";
+        btn.textContent = "See more";
+        btn.setAttribute("data-open", "false");
+      } else {
+        moreText.style.display = "block";
+        btn.textContent = "See less";
+        btn.setAttribute("data-open", "true");
+      }
+    });
+  });
+</script>
 </body>
 </html>
