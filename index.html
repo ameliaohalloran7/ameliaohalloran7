@@ -12,9 +12,11 @@
     body {
       margin: 0;
       font-family: "Times New Roman", Times, serif;
-      background-color: #f0e7d8; 
-      color: #0a1a3c; 
-      display: flex;
+      background: url('IMG_7152.jpg') no-repeat center center fixed; 
+      background-size: cover; 
+      /* background-color: #f0e7d8; 
+      color: #0a1a3c; */
+      display: block;
       flex-direction: column;
       min-height: 100vh;
       align-items: flex-start;
@@ -24,7 +26,7 @@
     .container {
       display: flex;
       width: 100%;
-      align-items: flex-start;
+      align-items: stretch;
       margin-top: 5vh; 
     }
 
@@ -37,7 +39,9 @@
 
     .sidebar {
       width: 250px;
-      background-color: #f0e7d8;
+      /* background-color: #f0e7d8; */
+      background-color: rgba(240, 231, 216, 0.8);
+     /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -47,7 +51,8 @@
       justify-content: flex-start;
       position: sticky;
       top: 5vh; 
-      height: calc(100vh - 10vh);
+      height: auto;
+      margin-bottom: 5vh;
     }
 
     .sidebar img {
@@ -84,21 +89,24 @@
       color: #8B4513; 
     }
 
-    main {
-      flex-grow: 0;
-      max-width: 650px;       
+   main {
+      width: 650px; 
+      max-width: 650px;
       line-height: 1.6;
-      padding: 2.5rem 2rem;
-      overflow-y: auto;
-      display: flex;
+      padding: 1.8rem 2rem 0.5rem 2rem;
+      overflow: visible;
+      display: block;
       flex-direction: column;
-      justify-content: flex-start;
-      margin-left: 260px;     
+      justify-content: flex-start; 
+      margin-left: 100px;
+      background-color: rgba(240, 231, 216, 0.8);
+      margin-bottom: 5vh; 
+      min-height: 100%;
+
     }
 
     section {
       display: none;
-      min-height: calc(100vh - 6rem);
     }
 
     section.active {
@@ -134,12 +142,14 @@
     }
 
     a {
-      color: #0a1a3c;
-      text-decoration: underline;
+      color: #8B4513;
+      text-decoration: none;
+
     }
 
     a:hover {
-      color: #07122b;
+      color: #5C2E0C;
+      text-decoration: underline;
     }
 
     .item {
@@ -162,16 +172,16 @@
       border: none;
       font-size: 1rem;
       font-family: "Times New Roman", Times, serif;
-      color: #0a1a3c;
+      color: #8B4513;
       cursor: pointer;
-      text-decoration: underline;
+      text-decoration: none;
       padding: 0;
       margin-top: 0.5rem;
       font-style:italic;
     }
 
     .see-more:hover {
-      color: #8B4513;
+      color: #5C2E0C;
     }
 
     .more-text img {
@@ -200,10 +210,13 @@
       }
 
       main {
+        width: 90%;           
+        max-width: 90%;      
+        margin: 1rem auto;    
+        padding: 2rem 1rem;
         height: auto;
         justify-content: flex-start;
-        padding: 2rem 1rem;
-        margin-left: 0;
+        border-radius: 10px;
       }
     }
   </style>
@@ -231,9 +244,9 @@
           <br>
           <br>
           I studied computer science at Brown University; I also hold an MPhil from the University of Cambridge in Digital Humanities.
-          <br> 
-          <br>
-          <br>
+          
+
+          
           
 
         </p>
@@ -292,7 +305,7 @@
         <div class="item">
           <h3>Privacy Caselaw in the US and UK</h3>
           <h4>Created as part of the MPhil in Digital Humanities at the University of Cambridge</h4>
-          <p>Textual analysis of privacy-related caselaw in the US and the UK, performed using Python and R.</p>
+          <p>Textual analysis of privacy-related caselaw in the US and the UK, performed using Python and R. Full data pipeline and code can be found <a href="https://github.com/ameliaohalloran7/privacy-caselaw">here</a>.</p>
         <div class="more-text" style="display:none;">
           <p>
             I conducted a "distant reading" of privacy-related caselaw, first by using Python to extract the text of all cases from the US Supreme Court and the UK Supreme Court (or the UK House of Lords prior to 2009), then by using R to perform keyword-in-context analyses. The two figures below are sample outputs of this analysis, wherein I focus on the keywords of privacy-related caselaw in one country that are unique to privacy-related cases as opposed to non-privacy-related cases. This allows us to compare the privacy-specific topics and themes across the two jurisdictions, finding that the US had a more technological bent to privacy cases, whereas the UK's privacy orientation was typically that of journalistic and media-related questions. If you are interested in the additional outcomes of this analysis, such as the partisan nature of privacy in the US or the most common precedents invoked across jurisdictions, please email me.  
