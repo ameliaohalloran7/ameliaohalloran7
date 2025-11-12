@@ -6,14 +6,14 @@
   <title>Amelia O'Halloran</title>
   <style>
     html {
-      overflow-y: scroll; /* keeps layout consistent across pages */
+      overflow-y: scroll; 
     }
 
     body {
       margin: 0;
       font-family: "Times New Roman", Times, serif;
-      background-color: #f0e7d8; /* darker tan */
-      color: #0a1a3c; /* dark blue */
+      background-color: #f0e7d8; 
+      color: #0a1a3c; 
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -25,17 +25,16 @@
       display: flex;
       width: 100%;
       align-items: flex-start;
-      margin-top: 5vh; /* slightly above center */
+      margin-top: 5vh; 
     }
 
     .section-divider {
       border: none;
-      border-top: 3px solid #0a1a3c;   /* thicker dark blue */
+      border-top: 3px solid #0a1a3c;   
       margin: 2rem 0;
-      opacity: 0.4;                    /* soften it slightly */
+      opacity: 0.4;                    
     }
 
-    /* Sidebar */
     .sidebar {
       width: 250px;
       background-color: #f0e7d8;
@@ -47,7 +46,7 @@
       flex-shrink: 0;
       justify-content: flex-start;
       position: sticky;
-      top: 5vh; /* visually slightly below top */
+      top: 5vh; 
       height: calc(100vh - 10vh);
     }
 
@@ -73,30 +72,28 @@
       border: none;
       font-family: inherit;
       font-size: 1rem;
-      color: #0a1a3c; /* default dark blue */
+      color: #0a1a3c; 
       cursor: pointer;
       position: relative;
       padding: 0.4rem;
       transition: color 0.5s ease;
     }
 
-    /* Change color to brown on hover or active */
     .sidebar button:hover,
     .sidebar button.active {
-      color: #8B4513; /* brown */
+      color: #8B4513; 
     }
 
-    /* Main Content */
     main {
       flex-grow: 0;
-      max-width: 650px;       /* thinner column */
+      max-width: 650px;       
       line-height: 1.6;
       padding: 2.5rem 2rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      margin-left: 260px;     /* shifted left */
+      margin-left: 260px;     
     }
 
     section {
@@ -148,7 +145,7 @@
     .item {
       margin-bottom: 2rem;
       padding-bottom: 1.5rem;
-      border-bottom: 1px solid #0a1a3c33; /* subtle dark blue, 20% opacity */
+      border-bottom: 1px solid #0a1a3c33;  
     }
     .item:last-of-type {
       border-bottom: none;
@@ -181,7 +178,6 @@
       border-radius: 4px;
     }
 
-    /* Responsive adjustments */
     @media (max-width: 800px) {
       body {
         flex-direction: column;
@@ -343,7 +339,6 @@
           section.classList.toggle('active', section.id === target);
         });
 
-        // Scroll main back to top each time
         document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
       });
     });
@@ -353,7 +348,7 @@
 
   expandButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-      const moreText = btn.previousElementSibling; // the .more-text div
+      const moreText = btn.previousElementSibling; 
       const isOpen = btn.getAttribute("data-open") === "true";
 
       if (isOpen) {
