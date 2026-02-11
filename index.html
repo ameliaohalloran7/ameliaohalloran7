@@ -58,7 +58,7 @@
     .sidebar img {
       width: 140px;
       height: 140px;
-      border-radius: 50%;
+      /* border-radius: 50%; */
       object-fit: cover;
       margin-bottom: 1.25rem;
       border: none;
@@ -80,7 +80,7 @@
 }
 
     .sidebar button {
-  background-color: none; 
+  background-color: transparent; 
   border: none;
   /* border-radius: 8px; */
   font-family: inherit;
@@ -96,6 +96,8 @@
 
 .sidebar button:hover,
 .sidebar button.active {
+    background-color: transparent; 
+
   /*background-color: rgba(240, 231, 216, 0.95); */
   color: #8B4513;
   transform: translateY(-2px); 
