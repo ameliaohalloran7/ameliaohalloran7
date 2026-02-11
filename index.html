@@ -12,10 +12,10 @@
     body {
       margin: 0;
       font-family: "Times New Roman", Times, serif;
-      background: url('IMG_7152.jpg') no-repeat center center fixed; 
-      background-size: cover; 
-      /* background-color: #f0e7d8; 
-      color: #0a1a3c; */
+      /* background: url('IMG_7152.jpg') no-repeat center center fixed; 
+      background-size: cover; */
+      background-color: #f0e7d8; 
+      /* color: #0a1a3c; */
       display: block;
       flex-direction: column;
       min-height: 100vh;
@@ -71,6 +71,13 @@
       width: 100%;
       text-align: center;
     }
+
+    .bottom-photo {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 2rem auto 1rem auto; /* centers and adds space above */
+}
 
     .sidebar button {
   background-color: rgba(240, 231, 216, 0.75); 
@@ -381,5 +388,8 @@
     });
   });
 </script>
+<img src="IMG_7152.jpg" alt="Decorative bottom photo" class="bottom-photo">
+
+
 </body>
 </html>
