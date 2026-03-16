@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Where Is Your Neighborhood? — Amelia O'Halloran</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Leaflet.draw -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+  <!-- Leaflet.heat -->
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+  <style>
+    /* -----------------------------------------------------------------------
+       Base — matches ameliaohalloran.com
+    ----------------------------------------------------------------------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Courier New", Courier, monospace;
+      background-color: #D5E4F9;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    a { color: #8B4513; text-decoration: none; }
+    a:hover { color: #5C2E0C; text-decoration: underline; }
+
+    /* -----------------------------------------------------------------------
+       Header
+    ----------------------------------------------------------------------- */
+    #page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      height: 48px;
+      background-color: #D5E4F9;
+      border-bottom: 2px solid rgba(10, 26, 60, 0.2);
+      flex-shrink: 0;
+      gap: 12px;
+    }
+
+    #header-title {
+      font-size: 0.95rem;
+      color: #0a1a3c;
+      font-weight: normal;
+    }
+
+    #header-title strong {
+      color: #0a1a3c;
+    }
+
+    #header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+      font-size: 0.85rem;
+    }
+
+    #submission-count {
+      color: #0a1a3c;
+      opacity: 0.65;
+      white-space: nowrap;
+    }
+
+    /* -----------------------------------------------------------------------
+       Instructions banner
+    ----------------------------------------------------------------------- */
+    #instructions {
+      background-color: rgba(10, 26, 60, 0.06);
+      border-bottom: 1px solid rgba(10, 26, 60, 0.12);
+      color: #0a1a3c;
+      font-size: 0.83rem;
+      padding: 7px 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    #instructions.hidden { display: none; }
+
+    /* -----------------------------------------------------------------------
+       Map
+    ----------------------------------------------------------------------- */
+    #map {
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+    }
+
+    /* -----------------------------------------------------------------------
+       Slide-up submission form
+    ----------------------------------------------------------------------- */
+    #form-panel {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 440px;
+      background: #faf8f4;
+      border-radius: 14px 14px 0 0;
+      border-top: 2px solid rgba(10, 26, 60, 0.15);
+      box-shadow: 0 -4px 24px rgba(10, 26, 60, 0.12);
+      z-index: 2000;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    #form-panel.hidden {
+      transform: translateX(-50%) translateY(100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #form-inner {
+      padding: 22px 24px 26px;
+    }
+
+    #form-inner h2 {
+      font-size: 1rem;
+      font-weight: normal;
+      color: #0a1a3c;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      font-size: 0.8rem;
+      color: #0a1a3c;
+      opacity: 0.75;
+    }
+
+    .field input {
+      border: 1px solid rgba(10, 26, 60, 0.3);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      font-family: "Courier New", Courier, monospace;
+      background: white;
+      outline: none;
+      color: #0a1a3c;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus { border-color: #8B4513; }
+
+    #form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    #form-status {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      min-height: 18px;
+    }
+
+    #form-status.error   { color: #8B0000; }
+    #form-status.success { color: #2e5e2e; }
+
+    /* -----------------------------------------------------------------------
+       Buttons
+    ----------------------------------------------------------------------- */
+    .btn-primary, .btn-secondary {
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      font-family: "Courier New", Courier, monospace;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background-color: #0a1a3c;
+      color: #D5E4F9;
+      flex: 1;
+    }
+
+    .btn-primary:hover  { background-color: #162d6a; }
+    .btn-primary:active { opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: #8B4513;
+      border: 1px solid rgba(139, 69, 19, 0.35);
+    }
+
+    .btn-secondary:hover { color: #5C2E0C; border-color: #5C2E0C; transform: translateY(-1px); }
+
+    #btn-overlay.active {
+      color: #5C2E0C;
+      border-color: #5C2E0C;
+      text-decoration: underline;
+    }
+
+    /* -----------------------------------------------------------------------
+       Utility
+    ----------------------------------------------------------------------- */
+    .hidden { display: none !important; }
+
+    @media (max-width: 500px) {
+      #form-panel   { max-width: 100%; }
+      #header-title { font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header id="page-header">
+    <div id="header-title">
+      <strong>Where Is Your Neighborhood?</strong>
+    </div>
+    <div id="header-right">
+      <button id="btn-overlay" class="btn-secondary">Show all submissions</button>
+      <span id="submission-count"></span>
+      <a href="https://ameliaohalloran.com" title="Back to main site">← ameliaohalloran.com</a>
+    </div>
+  </header>
+
+  <!-- Instructions -->
+  <div id="instructions">
+    Use the <strong>polygon tool</strong> in the toolbar on the left to draw the boundaries of your neighborhood.
+    Click to add points &mdash; click the first point (or double-click) to close the shape.
+  </div>
+
+  <!-- Map -->
+  <div id="map"></div>
+
+  <!-- Submission form -->
+  <div id="form-panel" class="hidden">
+    <div id="form-inner">
+      <h2>Name your neighborhood</h2>
+      <div class="field">
+        <label for="input-name">Neighborhood name</label>
+        <input id="input-name" type="text" placeholder="e.g. Capitol Hill" maxlength="100" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="input-city">City</label>
+        <input id="input-city" type="text" placeholder="e.g. Seattle, WA" maxlength="100" autocomplete="off" />
+      </div>
+      <div id="form-actions">
+        <button id="btn-cancel" class="btn-secondary">Redraw</button>
+        <button id="btn-submit" class="btn-primary">Submit</button>
+      </div>
+      <div id="form-status"></div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // CONFIG — replace with your deployed backend URL (no trailing slash)
+    // e.g. "https://neighborhood-boundary-app.onrender.com"
+    // =========================================================================
+    const API_URL = "https://YOUR-BACKEND-URL-HERE";
+
+    // -------------------------------------------------------------------------
+    // State
+    // -------------------------------------------------------------------------
+    let pendingGeometry = null;
+    let drawnLayer      = null;
+    let heatLayer       = null;
+    let polyOverlay     = null;
+    let overlayVisible  = false;
+
+    // -------------------------------------------------------------------------
+    // DOM refs
+    // -------------------------------------------------------------------------
+    const formPanel    = document.getElementById("form-panel");
+    const inputName    = document.getElementById("input-name");
+    const inputCity    = document.getElementById("input-city");
+    const btnSubmit    = document.getElementById("btn-submit");
+    const btnCancel    = document.getElementById("btn-cancel");
+    const btnOverlay   = document.getElementById("btn-overlay");
+    const formStatus   = document.getElementById("form-status");
+    const instructions = document.getElementById("instructions");
+    const countEl      = document.getElementById("submission-count");
+
+    // -------------------------------------------------------------------------
+    // Map
+    // -------------------------------------------------------------------------
+    const map = L.map("map", { zoomControl: true });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => map.setView([pos.coords.latitude, pos.coords.longitude], 13),
+        ()    => map.setView([39.5, -98.35], 4),
+        { timeout: 6000 }
+      );
+    } else {
+      map.setView([39.5, -98.35], 4);
+    }
+
+    // -------------------------------------------------------------------------
+    // Draw controls
+    // -------------------------------------------------------------------------
+    const drawnItems = new L.FeatureGroup().addTo(map);
+
+    const drawControl = new L.Control.Draw({
+      position: "topleft",
+      draw: {
+        polygon:      { shapeOptions: { color: "#0a1a3c", fillOpacity: 0.12, weight: 2 } },
+        polyline:     false,
+        rectangle:    false,
+        circle:       false,
+        marker:       false,
+        circlemarker: false,
+      },
+      edit: { featureGroup: drawnItems, remove: false },
+    });
+    map.addControl(drawControl);
+
+    map.on(L.Draw.Event.DRAWSTART, () => {
+      clearDrawing();
+      instructions.classList.add("hidden");
+    });
+
+    map.on(L.Draw.Event.CREATED, (e) => {
+      drawnLayer = e.layer;
+      drawnItems.addLayer(drawnLayer);
+      pendingGeometry = drawnLayer.toGeoJSON().geometry;
+      showForm();
+    });
+
+    // -------------------------------------------------------------------------
+    // Form helpers
+    // -------------------------------------------------------------------------
+    function showForm() {
+      formPanel.classList.remove("hidden");
+      inputName.focus();
+      setStatus("", "");
+    }
+
+    function hideForm() {
+      formPanel.classList.add("hidden");
+      inputName.value = "";
+      inputCity.value = "";
+      btnCancel.textContent = "Redraw";
+      btnSubmit.disabled = false;
+      setStatus("", "");
+    }
+
+    function clearDrawing() {
+      if (drawnLayer) { drawnItems.removeLayer(drawnLayer); drawnLayer = null; }
+      pendingGeometry = null;
+    }
+
+    function setStatus(msg, type) {
+      formStatus.textContent = msg;
+      formStatus.className   = type;
+    }
+
+    btnCancel.addEventListener("click", () => {
+      clearDrawing();
+      hideForm();
+      instructions.classList.remove("hidden");
+    });
+
+    // -------------------------------------------------------------------------
+    // Submit
+    // -------------------------------------------------------------------------
+    btnSubmit.addEventListener("click", async () => {
+      const name = inputName.value.trim();
+      const city = inputCity.value.trim();
+
+      if (!name) { setStatus("Please enter a neighborhood name.", "error"); return; }
+      if (!city) { setStatus("Please enter a city.", "error"); return; }
+      if (!pendingGeometry) { setStatus("No polygon drawn — please draw your neighborhood first.", "error"); return; }
+
+      btnSubmit.disabled = true;
+      setStatus("Saving…", "");
+
+      try {
+        const res  = await fetch(`${API_URL}/api/submit`, {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ geometry: pendingGeometry, neighborhood_name: name, city }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          setStatus("Submitted — thank you!", "success");
+          btnCancel.textContent = "Draw another";
+          fetchCount();
+          if (overlayVisible) loadOverlay();
+        } else {
+          setStatus(data.error || "Submission failed — please try again.", "error");
+          btnSubmit.disabled = false;
+        }
+      } catch {
+        setStatus("Network error — please check your connection and try again.", "error");
+        btnSubmit.disabled = false;
+      }
+    });
+
+    [inputName, inputCity].forEach((el) => {
+      el.addEventListener("keydown", (e) => { if (e.key === "Enter") btnSubmit.click(); });
+    });
+
+    // -------------------------------------------------------------------------
+    // Overlay
+    // -------------------------------------------------------------------------
+    btnOverlay.addEventListener("click", async () => {
+      overlayVisible = !overlayVisible;
+      if (overlayVisible) {
+        btnOverlay.classList.add("active");
+        btnOverlay.textContent = "Hide submissions";
+        await loadOverlay();
+      } else {
+        btnOverlay.classList.remove("active");
+        btnOverlay.textContent = "Show all submissions";
+        removeOverlay();
+      }
+    });
+
+    async function loadOverlay() {
+      removeOverlay();
+      let fc;
+      try {
+        const res = await fetch(`${API_URL}/api/submissions`);
+        fc = await res.json();
+      } catch { return; }
+
+      if (!fc.features || fc.features.length === 0) return;
+
+      polyOverlay = L.geoJSON(fc, {
+        style: {
+          color:       "#8B4513",
+          weight:      1.5,
+          opacity:     0.5,
+          fillColor:   "#8B4513",
+          fillOpacity: 0.06,
+        },
+      }).addTo(map);
+
+      const points = fc.features
+        .map((f) => centroid(f.geometry))
+        .filter(Boolean)
+        .map(([lon, lat]) => [lat, lon, 1]);
+
+      if (points.length > 0) {
+        heatLayer = L.heatLayer(points, { radius: 30, blur: 22, maxZoom: 17 }).addTo(map);
+      }
+    }
+
+    function removeOverlay() {
+      if (polyOverlay) { map.removeLayer(polyOverlay); polyOverlay = null; }
+      if (heatLayer)   { map.removeLayer(heatLayer);   heatLayer   = null; }
+    }
+
+    function centroid(geometry) {
+      if (!geometry || geometry.type !== "Polygon") return null;
+      const ring = geometry.coordinates[0];
+      if (!ring || ring.length === 0) return null;
+      let sumLon = 0, sumLat = 0;
+      for (const [lon, lat] of ring) { sumLon += lon; sumLat += lat; }
+      return [sumLon / ring.length, sumLat / ring.length];
+    }
+
+    // -------------------------------------------------------------------------
+    // Count badge
+    // -------------------------------------------------------------------------
+    async function fetchCount() {
+      try {
+        const res  = await fetch(`${API_URL}/api/count`);
+        const data = await res.json();
+        countEl.textContent = data.count === 1
+          ? "1 submission"
+          : `${data.count.toLocaleString()} submissions`;
+      } catch { /* non-critical */ }
+    }
+
+    fetchCount();
+  </script>
+</body>
+</html>
