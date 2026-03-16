@@ -17,9 +17,6 @@
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
   <style>
-    /* -----------------------------------------------------------------------
-       Base — matches ameliaohalloran.com
-    ----------------------------------------------------------------------- */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -55,10 +52,6 @@
       font-weight: normal;
     }
 
-    #header-title strong {
-      color: #0a1a3c;
-    }
-
     #header-right {
       display: flex;
       align-items: center;
@@ -74,19 +67,50 @@
     }
 
     /* -----------------------------------------------------------------------
-       Instructions banner
+       Draw action bar
     ----------------------------------------------------------------------- */
-    #instructions {
-      background-color: rgba(10, 26, 60, 0.06);
+    #draw-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      background-color: rgba(10, 26, 60, 0.04);
       border-bottom: 1px solid rgba(10, 26, 60, 0.12);
-      color: #0a1a3c;
-      font-size: 0.83rem;
-      padding: 7px 20px;
-      text-align: center;
       flex-shrink: 0;
+      gap: 12px;
     }
 
-    #instructions.hidden { display: none; }
+    #btn-draw {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 11px 36px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #0a1a3c;
+      color: #D5E4F9;
+      letter-spacing: 0.02em;
+      transition: background-color 0.2s, transform 0.15s;
+    }
+
+    #btn-draw:hover  { background-color: #162d6a; transform: translateY(-1px); }
+    #btn-draw:active { transform: translateY(0); }
+
+    #btn-draw.drawing {
+      background-color: #6b2e0a;
+      color: #fff;
+    }
+
+    #btn-draw.drawing:hover { background-color: #8B4513; }
+
+    #draw-hint {
+      font-size: 0.8rem;
+      color: #0a1a3c;
+      opacity: 0.6;
+    }
+
+    #draw-hint.hidden { display: none; }
 
     /* -----------------------------------------------------------------------
        Map
@@ -97,6 +121,9 @@
       min-height: 0;
     }
 
+    /* Hide the default Leaflet.draw toolbar — we drive it programmatically */
+    .leaflet-draw { display: none !important; }
+
     /* -----------------------------------------------------------------------
        Slide-up submission form
     ----------------------------------------------------------------------- */
@@ -106,7 +133,7 @@
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       background: #faf8f4;
       border-radius: 14px 14px 0 0;
       border-top: 2px solid rgba(10, 26, 60, 0.15);
@@ -145,7 +172,8 @@
       opacity: 0.75;
     }
 
-    .field input {
+    .field input[type="text"],
+    .field input[type="tel"] {
       border: 1px solid rgba(10, 26, 60, 0.3);
       border-radius: 6px;
       padding: 8px 10px;
@@ -157,7 +185,51 @@
       transition: border-color 0.2s;
     }
 
-    .field input:focus { border-color: #8B4513; }
+    .field input[type="text"]:focus,
+    .field input[type="tel"]:focus { border-color: #8B4513; }
+
+    .optional {
+      font-style: italic;
+      opacity: 0.65;
+      font-weight: normal;
+    }
+
+    /* Payment method row */
+    #payment-row {
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: rgba(10, 26, 60, 0.04);
+      border-radius: 6px;
+      border: 1px solid rgba(10, 26, 60, 0.1);
+    }
+
+    #payment-row p {
+      font-size: 0.8rem;
+      color: #0a1a3c;
+      margin-bottom: 8px;
+    }
+
+    .radio-options {
+      display: flex;
+      gap: 20px;
+    }
+
+    .radio-options label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.88rem;
+      color: #0a1a3c;
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    .radio-options input[type="radio"] {
+      accent-color: #8B4513;
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
 
     #form-actions {
       display: flex;
@@ -211,14 +283,12 @@
       text-decoration: underline;
     }
 
-    /* -----------------------------------------------------------------------
-       Utility
-    ----------------------------------------------------------------------- */
     .hidden { display: none !important; }
 
     @media (max-width: 500px) {
       #form-panel   { max-width: 100%; }
       #header-title { font-size: 0.82rem; }
+      #btn-draw     { font-size: 0.92rem; padding: 10px 24px; }
     }
   </style>
 </head>
@@ -236,10 +306,10 @@
     </div>
   </header>
 
-  <!-- Instructions -->
-  <div id="instructions">
-    Use the <strong>polygon tool</strong> in the toolbar on the left to draw the boundaries of your neighborhood.
-    Click to add points &mdash; click the first point (or double-click) to close the shape.
+  <!-- Draw action bar -->
+  <div id="draw-bar">
+    <button id="btn-draw">Begin Drawing</button>
+    <span id="draw-hint">Click on the map to place points &mdash; click the first point to finish</span>
   </div>
 
   <!-- Map -->
@@ -257,6 +327,17 @@
         <label for="input-city">City</label>
         <input id="input-city" type="text" placeholder="e.g. Seattle, WA" maxlength="100" autocomplete="off" />
       </div>
+      <div class="field">
+        <label for="input-phone">Phone number <span class="optional">(optional)</span></label>
+        <input id="input-phone" type="tel" placeholder="e.g. 555-867-5309" maxlength="20" autocomplete="tel" />
+        <div id="payment-row" class="hidden">
+          <p>Receive $0 via:</p>
+          <div class="radio-options">
+            <label><input type="radio" name="payment" value="venmo" /> Venmo</label>
+            <label><input type="radio" name="payment" value="zelle" /> Zelle</label>
+          </div>
+        </div>
+      </div>
       <div id="form-actions">
         <button id="btn-cancel" class="btn-secondary">Redraw</button>
         <button id="btn-submit" class="btn-primary">Submit</button>
@@ -266,10 +347,6 @@
   </div>
 
   <script>
-    // =========================================================================
-    // CONFIG — replace with your deployed backend URL (no trailing slash)
-    // e.g. "https://neighborhood-boundary-app.onrender.com"
-    // =========================================================================
     const API_URL = "https://neighborhood-mapping-app.onrender.com";
 
     // -------------------------------------------------------------------------
@@ -277,6 +354,7 @@
     // -------------------------------------------------------------------------
     let pendingGeometry = null;
     let drawnLayer      = null;
+    let polygonDrawer   = null;
     let heatLayer       = null;
     let polyOverlay     = null;
     let overlayVisible  = false;
@@ -284,15 +362,18 @@
     // -------------------------------------------------------------------------
     // DOM refs
     // -------------------------------------------------------------------------
-    const formPanel    = document.getElementById("form-panel");
-    const inputName    = document.getElementById("input-name");
-    const inputCity    = document.getElementById("input-city");
-    const btnSubmit    = document.getElementById("btn-submit");
-    const btnCancel    = document.getElementById("btn-cancel");
-    const btnOverlay   = document.getElementById("btn-overlay");
-    const formStatus   = document.getElementById("form-status");
-    const instructions = document.getElementById("instructions");
-    const countEl      = document.getElementById("submission-count");
+    const formPanel   = document.getElementById("form-panel");
+    const inputName   = document.getElementById("input-name");
+    const inputCity   = document.getElementById("input-city");
+    const inputPhone  = document.getElementById("input-phone");
+    const paymentRow  = document.getElementById("payment-row");
+    const btnSubmit   = document.getElementById("btn-submit");
+    const btnCancel   = document.getElementById("btn-cancel");
+    const btnOverlay  = document.getElementById("btn-overlay");
+    const btnDraw     = document.getElementById("btn-draw");
+    const drawHint    = document.getElementById("draw-hint");
+    const formStatus  = document.getElementById("form-status");
+    const countEl     = document.getElementById("submission-count");
 
     // -------------------------------------------------------------------------
     // Map
@@ -315,12 +396,11 @@
     }
 
     // -------------------------------------------------------------------------
-    // Draw controls
+    // Draw setup (toolbar hidden via CSS; driven programmatically)
     // -------------------------------------------------------------------------
     const drawnItems = new L.FeatureGroup().addTo(map);
 
     const drawControl = new L.Control.Draw({
-      position: "topleft",
       draw: {
         polygon:      { shapeOptions: { color: "#0a1a3c", fillOpacity: 0.12, weight: 2 } },
         polyline:     false,
@@ -333,16 +413,56 @@
     });
     map.addControl(drawControl);
 
-    map.on(L.Draw.Event.DRAWSTART, () => {
+    const POLYGON_OPTIONS = { shapeOptions: { color: "#0a1a3c", fillOpacity: 0.12, weight: 2 } };
+
+    function startDrawing() {
       clearDrawing();
-      instructions.classList.add("hidden");
+      polygonDrawer = new L.Draw.Polygon(map, POLYGON_OPTIONS);
+      polygonDrawer.enable();
+      btnDraw.textContent = "Cancel Drawing";
+      btnDraw.classList.add("drawing");
+      drawHint.classList.remove("hidden");
+    }
+
+    function stopDrawing() {
+      if (polygonDrawer) { polygonDrawer.disable(); polygonDrawer = null; }
+      btnDraw.textContent = "Begin Drawing";
+      btnDraw.classList.remove("drawing");
+      drawHint.classList.add("hidden");
+    }
+
+    btnDraw.addEventListener("click", () => {
+      if (btnDraw.classList.contains("drawing")) {
+        stopDrawing();
+      } else {
+        startDrawing();
+      }
     });
+
+    // Hide hint initially
+    drawHint.classList.add("hidden");
 
     map.on(L.Draw.Event.CREATED, (e) => {
       drawnLayer = e.layer;
       drawnItems.addLayer(drawnLayer);
       pendingGeometry = drawnLayer.toGeoJSON().geometry;
+      polygonDrawer = null;
+      btnDraw.textContent = "Begin Drawing";
+      btnDraw.classList.remove("drawing");
+      drawHint.classList.add("hidden");
       showForm();
+    });
+
+    // -------------------------------------------------------------------------
+    // Phone → show/hide payment row
+    // -------------------------------------------------------------------------
+    inputPhone.addEventListener("input", () => {
+      if (inputPhone.value.trim().length > 0) {
+        paymentRow.classList.remove("hidden");
+      } else {
+        paymentRow.classList.add("hidden");
+        document.querySelectorAll("input[name='payment']").forEach(r => r.checked = false);
+      }
     });
 
     // -------------------------------------------------------------------------
@@ -356,8 +476,11 @@
 
     function hideForm() {
       formPanel.classList.add("hidden");
-      inputName.value = "";
-      inputCity.value = "";
+      inputName.value  = "";
+      inputCity.value  = "";
+      inputPhone.value = "";
+      paymentRow.classList.add("hidden");
+      document.querySelectorAll("input[name='payment']").forEach(r => r.checked = false);
       btnCancel.textContent = "Redraw";
       btnSubmit.disabled = false;
       setStatus("", "");
@@ -376,15 +499,17 @@
     btnCancel.addEventListener("click", () => {
       clearDrawing();
       hideForm();
-      instructions.classList.remove("hidden");
     });
 
     // -------------------------------------------------------------------------
     // Submit
     // -------------------------------------------------------------------------
     btnSubmit.addEventListener("click", async () => {
-      const name = inputName.value.trim();
-      const city = inputCity.value.trim();
+      const name          = inputName.value.trim();
+      const city          = inputCity.value.trim();
+      const phone         = inputPhone.value.trim();
+      const paymentRadio  = document.querySelector("input[name='payment']:checked");
+      const payment       = paymentRadio ? paymentRadio.value : null;
 
       if (!name) { setStatus("Please enter a neighborhood name.", "error"); return; }
       if (!city) { setStatus("Please enter a city.", "error"); return; }
@@ -394,10 +519,16 @@
       setStatus("Saving…", "");
 
       try {
-        const res  = await fetch(`${API_URL}/api/submit`, {
+        const res = await fetch(`${API_URL}/api/submit`, {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify({ geometry: pendingGeometry, neighborhood_name: name, city }),
+          body:    JSON.stringify({
+            geometry:          pendingGeometry,
+            neighborhood_name: name,
+            city,
+            phone:             phone || null,
+            payment_method:    phone ? payment : null,
+          }),
         });
         const data = await res.json();
 
@@ -416,7 +547,7 @@
       }
     });
 
-    [inputName, inputCity].forEach((el) => {
+    [inputName, inputCity, inputPhone].forEach((el) => {
       el.addEventListener("keydown", (e) => { if (e.key === "Enter") btnSubmit.click(); });
     });
 
