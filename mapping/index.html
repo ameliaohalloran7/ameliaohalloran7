@@ -285,6 +285,69 @@
 
     .hidden { display: none !important; }
 
+    /* -----------------------------------------------------------------------
+       City picker modal
+    ----------------------------------------------------------------------- */
+    #city-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 26, 60, 0.55);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #city-modal {
+      background: #faf8f4;
+      border-radius: 14px;
+      padding: 36px 32px 32px;
+      max-width: 380px;
+      width: 90%;
+      box-shadow: 0 8px 40px rgba(10, 26, 60, 0.22);
+      text-align: center;
+    }
+
+    #city-modal h2 {
+      font-size: 1.1rem;
+      font-weight: normal;
+      color: #0a1a3c;
+      margin-bottom: 8px;
+    }
+
+    #city-modal p {
+      font-size: 0.82rem;
+      color: #0a1a3c;
+      opacity: 0.65;
+      margin-bottom: 24px;
+    }
+
+    .city-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .city-btn {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.95rem;
+      padding: 12px 20px;
+      border: 1px solid rgba(10, 26, 60, 0.25);
+      border-radius: 8px;
+      background: white;
+      color: #0a1a3c;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    }
+
+    .city-btn:hover {
+      background: #D5E4F9;
+      border-color: #0a1a3c;
+      transform: translateY(-1px);
+    }
+
+    .city-btn:active { transform: translateY(0); }
+
     @media (max-width: 500px) {
       #form-panel   { max-width: 100%; }
       #header-title { font-size: 0.82rem; }
@@ -312,6 +375,19 @@
     <span id="draw-hint">Click on the map to place points &mdash; click the first point to finish</span>
   </div>
 
+  <!-- City picker modal -->
+  <div id="city-modal-backdrop">
+    <div id="city-modal">
+      <h2>Which city do you live in?</h2>
+      <p>This study is currently collecting data for three cities.</p>
+      <div class="city-btn-group">
+        <button class="city-btn" data-city="Boston" data-lat="42.3601" data-lon="-71.0589" data-zoom="13">Boston, MA</button>
+        <button class="city-btn" data-city="Chicago" data-lat="41.8781" data-lon="-87.6298" data-zoom="12">Chicago, IL</button>
+        <button class="city-btn" data-city="New York City" data-lat="40.7128" data-lon="-74.0060" data-zoom="12">New York City, NY</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Map -->
   <div id="map"></div>
 
@@ -323,12 +399,9 @@
         <label for="input-name">Neighborhood name</label>
         <input id="input-name" type="text" placeholder="e.g. Capitol Hill" maxlength="100" autocomplete="off" />
       </div>
+      <input id="input-city" type="hidden" maxlength="100" />
       <div class="field">
-        <label for="input-city">City</label>
-        <input id="input-city" type="text" placeholder="e.g. Seattle, WA" maxlength="100" autocomplete="off" />
-      </div>
-      <div class="field">
-        <label for="input-phone">Phone number <span class="optional">(optional)</span></label>
+        <label for="input-phone">Phone number <span class="optional">(optional - for payment)</span></label>
         <input id="input-phone" type="tel" placeholder="e.g. 555-867-5309" maxlength="20" autocomplete="tel" />
         <div id="payment-row" class="hidden">
           <p>Receive $0 via:</p>
@@ -358,25 +431,27 @@
     let heatLayer       = null;
     let polyOverlay     = null;
     let overlayVisible  = false;
+    let selectedCity    = null;
 
     // -------------------------------------------------------------------------
     // DOM refs
     // -------------------------------------------------------------------------
-    const formPanel   = document.getElementById("form-panel");
-    const inputName   = document.getElementById("input-name");
-    const inputCity   = document.getElementById("input-city");
-    const inputPhone  = document.getElementById("input-phone");
-    const paymentRow  = document.getElementById("payment-row");
-    const btnSubmit   = document.getElementById("btn-submit");
-    const btnCancel   = document.getElementById("btn-cancel");
-    const btnOverlay  = document.getElementById("btn-overlay");
-    const btnDraw     = document.getElementById("btn-draw");
-    const drawHint    = document.getElementById("draw-hint");
-    const formStatus  = document.getElementById("form-status");
-    const countEl     = document.getElementById("submission-count");
+    const formPanel        = document.getElementById("form-panel");
+    const inputName        = document.getElementById("input-name");
+    const inputCity        = document.getElementById("input-city");
+    const inputPhone       = document.getElementById("input-phone");
+    const paymentRow       = document.getElementById("payment-row");
+    const btnSubmit        = document.getElementById("btn-submit");
+    const btnCancel        = document.getElementById("btn-cancel");
+    const btnOverlay       = document.getElementById("btn-overlay");
+    const btnDraw          = document.getElementById("btn-draw");
+    const drawHint         = document.getElementById("draw-hint");
+    const formStatus       = document.getElementById("form-status");
+    const countEl          = document.getElementById("submission-count");
+    const cityModalBackdrop = document.getElementById("city-modal-backdrop");
 
     // -------------------------------------------------------------------------
-    // Map
+    // Map — start with a neutral US view; city picker will set the real view
     // -------------------------------------------------------------------------
     const map = L.map("map", { zoomControl: true });
 
@@ -385,15 +460,22 @@
       maxZoom: 19,
     }).addTo(map);
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => map.setView([pos.coords.latitude, pos.coords.longitude], 13),
-        ()    => map.setView([39.5, -98.35], 4),
-        { timeout: 6000 }
-      );
-    } else {
-      map.setView([39.5, -98.35], 4);
-    }
+    map.setView([39.5, -98.35], 4);
+
+    // -------------------------------------------------------------------------
+    // City picker modal
+    // -------------------------------------------------------------------------
+    document.querySelectorAll(".city-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        selectedCity = btn.dataset.city;
+        const lat    = parseFloat(btn.dataset.lat);
+        const lon    = parseFloat(btn.dataset.lon);
+        const zoom   = parseInt(btn.dataset.zoom, 10);
+        map.setView([lat, lon], zoom);
+        inputCity.value = selectedCity;
+        cityModalBackdrop.style.display = "none";
+      });
+    });
 
     // -------------------------------------------------------------------------
     // Draw setup (toolbar hidden via CSS; driven programmatically)
@@ -477,7 +559,6 @@
     function hideForm() {
       formPanel.classList.add("hidden");
       inputName.value  = "";
-      inputCity.value  = "";
       inputPhone.value = "";
       paymentRow.classList.add("hidden");
       document.querySelectorAll("input[name='payment']").forEach(r => r.checked = false);
@@ -547,7 +628,7 @@
       }
     });
 
-    [inputName, inputCity, inputPhone].forEach((el) => {
+    [inputName, inputPhone].forEach((el) => {
       el.addEventListener("keydown", (e) => { if (e.key === "Enter") btnSubmit.click(); });
     });
 
