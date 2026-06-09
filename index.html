@@ -198,6 +198,29 @@
       color: #5C2E0C;
     }
 
+    .nav-link {
+      display: block;
+      background-color: transparent;
+      font-family: inherit;
+      font-size: 1rem;
+      color: inherit;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      width: 100%;
+      max-width: 160px;
+      margin: 0 auto;
+      text-align: center;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: #8B4513;
+      transform: translateY(-2px);
+      text-decoration: none;
+    }
+
     .more-text img {
       border-radius: 4px;
     }
@@ -244,6 +267,7 @@
         <button class="tab-button" data-tab="experience">Experience</button>
         <button class="tab-button" data-tab="projects">Projects</button>
         <button class="tab-button" data-tab="contact">Contact</button>
+        <a href="/blog/" class="nav-link">Blog</a>
       </nav>
     </aside>
 
@@ -369,6 +393,12 @@
         document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
       });
     });
+
+    const initialHash = window.location.hash.slice(1);
+    if (initialHash) {
+      const hashButton = document.querySelector(`.tab-button[data-tab="${initialHash}"]`);
+      if (hashButton) hashButton.click();
+    }
   </script>
   <script>
   const expandButtons = document.querySelectorAll(".see-more");
