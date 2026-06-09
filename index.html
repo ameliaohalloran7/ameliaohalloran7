@@ -262,12 +262,7 @@
   <div class="container">
     <aside class="sidebar">
       <img src="photo.jpg" alt="Amelia O'Halloran">
-      <nav>
-        <button class="tab-button active" data-tab="home">Home</button>
-        <button class="tab-button" data-tab="experience">Experience</button>
-        <button class="tab-button" data-tab="contact">Contact</button>
-        <a href="/blog/" class="nav-link">Blog</a>
-      </nav>
+      <nav id="site-nav"></nav>
     </aside>
 
     <main>
@@ -375,7 +370,9 @@
     </main>
   </div>
 
+  <script src="/nav.js"></script>
   <script>
+    // nav.js runs synchronously and has already populated #site-nav
     const buttons = document.querySelectorAll('.tab-button');
     const sections = document.querySelectorAll('section');
 
